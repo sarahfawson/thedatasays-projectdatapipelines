@@ -21,7 +21,7 @@ if not os.path.exists('data/tweets.csv'):
 if not os.path.exists('data/accounts.csv'):
     accounts_data_exists = False
 
-with open("config.json") as json_file:
+with open("etc/config.json") as json_file:
     config = json.load(json_file)
 
 auth = tweepy.OAuthHandler(config['twitter-oauth']['consumer-keys']['api-key'], config['twitter-oauth']['consumer-keys']['secret-key'])
@@ -44,15 +44,15 @@ for follow_account in config['twitter-accounts-following']:
             retweet_status = False
             rt = False
         raw_tweets_data['created_at'].append(tweet.created_at)
-        raw_tweets_data['id'].append(tweet.id)
+        raw_tweets_data['tweet_id'].append(int(tweet.id))
         raw_tweets_data['text'].append(text)
         raw_tweets_data['source'].append(tweet.source)
         raw_tweets_data['source_url'].append(tweet.source_url)
-        raw_tweets_data['in_reply_to_status_id'].append(tweet.in_reply_to_status_id)
-        raw_tweets_data['in_reply_to_user_id'].append(tweet.in_reply_to_user_id)
+        raw_tweets_data['in_reply_to_status_id'].append(str(tweet.in_reply_to_status_id))
+        raw_tweets_data['in_reply_to_user_id'].append(str(tweet.in_reply_to_user_id))
         raw_tweets_data['in_reply_to_screen_name'].append(tweet.in_reply_to_screen_name)
-        raw_tweets_data['author_id'].append(tweet.author.id)
-        raw_tweets_data['user_id'].append(tweet.user.id)
+        raw_tweets_data['author_id'].append(int(tweet.author.id))
+        raw_tweets_data['user_id'].append(int(tweet.user.id))
         # raw_tweets_data['contributors'].append(tweet.contributors)
         # raw_tweets_data['retweeted_status'].append(tweet.retweeted_status)
         raw_tweets_data['is_quote_status'].append(tweet.is_quote_status)
@@ -74,13 +74,14 @@ for follow_account in config['twitter-accounts-following']:
     print("%s tweets extracted and stored in database" % count)
 
 tweets_cols = [
-    'id',
+    'tweet_id',
     'created_at',
     'text',
     'source',
     'in_reply_to_status_id',
     'in_reply_to_user_id',
     'author_id',
+    'user_id',
     'is_quote_status',
     'is_retweet',
     'lang',
@@ -89,7 +90,7 @@ tweets_cols = [
 ]
 
 tweet_metrics_cols = [
-    'id',
+    'tweet_id',
     'pulled_at',
     'favorite_count',
     'retweet_count'
@@ -120,7 +121,7 @@ for user_id in unique_account_ids:
     except:
         print("user %s doesn't exist anymore!" % user_id)
         continue
-    raw_accounts_data['user_id'].append(user_id)
+    raw_accounts_data['user_id'].append(int(user_id))
     raw_accounts_data['name'].append(user.name)
     raw_accounts_data['screen_name'].append(user.screen_name)
     raw_accounts_data['location'].append(user.location)
